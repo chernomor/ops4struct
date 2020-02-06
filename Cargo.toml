@@ -1,0 +1,15 @@
+[package]
+name = "add_struct"
+version = "0.1.0"
+authors = ["Sergey Chernomorets <s.chernomorets@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+add_struct_derive = { path = "add_struct_derive" }
+
+
+[workspace]
+members = [
+	"add_struct_derive"
+]
+
