@@ -1,4 +1,4 @@
-pub use add_struct_derive::{
+pub use ops4struct_derive::{
 	Add,
 	AddAssign,
 	Sub,

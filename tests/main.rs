@@ -1,4 +1,4 @@
-extern crate add_struct;
+extern crate ops4struct;
 
 use std::ops::{
 	Add,
@@ -6,7 +6,7 @@ use std::ops::{
 	Sub,
 	SubAssign,
 };
-use add_struct::{
+use ops4struct::{
 	Add,
 	AddAssign,
 	Sub,

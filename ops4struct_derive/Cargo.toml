@@ -1,5 +1,5 @@
 [package]
-name = "add_struct_derive"
+name = "ops4struct_derive"
 version = "0.1.0"
 authors = ["Sergey Chernomorets <s.chernomorets@gmail.com>"]
 edition = "2018"

@@ -1,10 +1,10 @@
 // vim: set expandtab ts=4 sw=4:
-extern crate add_struct;
+extern crate ops4struct;
 
 use std::ops::{
 	Add,
 };
-use add_struct::{
+use ops4struct::{
 	Add,
 };
 
