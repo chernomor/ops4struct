@@ -70,15 +70,15 @@ pub fn add_assign(input: TokenStream) -> TokenStream {
 	let ops2 = ops.clone();
 	let tokens = quote! {
 		impl AddAssign for #struct_name {
-			fn add_assign(&mut self, other: Self) {
-				*self = Self {
+			fn add_assign(&mut self, other: #struct_name) {
+				*self = #struct_name {
 					#( #ops, )*
 				}
 			}
 		}
 		impl AddAssign<&#struct_name> for #struct_name {
-			fn add_assign(&mut self, other: &Self) {
-				*self = Self {
+			fn add_assign(&mut self, other: &#struct_name) {
+				*self = #struct_name {
 					#( #ops2, )*
 				}
 			}
@@ -99,9 +99,9 @@ pub fn sub(input: TokenStream) -> TokenStream {
 
 	let tokens = quote! {
 		impl Sub for #struct_name {
-			type Output = Self;
-			fn sub(self, other: Self) -> Self {
-				Self {
+			type Output = #struct_name;
+			fn sub(self, other: #struct_name) -> #struct_name {
+				#struct_name {
 					#( #ops, )*
 				}
 			}
@@ -121,8 +121,8 @@ pub fn sub_assign(input: TokenStream) -> TokenStream {
 
 	let tokens = quote! {
 		impl SubAssign for #struct_name {
-			fn sub_assign(&mut self, other: Self) {
-				*self = Self {
+			fn sub_assign(&mut self, other: #struct_name) {
+				*self = #struct_name {
 					#( #ops, )*
 				}
 			}
