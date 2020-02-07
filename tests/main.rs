@@ -26,10 +26,34 @@ fn add() {
     assert_eq!(C{w: 4, r: 4}, a+b);
 }
 #[test]
+fn add_ref_r() {
+	let a = C { w: 1, r: 0, };
+	let b = C { w: 3, r: 4, };
+    assert_eq!(C{w: 4, r: 4}, a+&b);
+}
+#[test]
+fn add_ref_l() {
+	let a = C { w: 1, r: 0, };
+	let b = C { w: 3, r: 4, };
+    assert_eq!(C{w: 4, r: 4}, &a+b);
+}
+#[test]
+fn add_ref_b() {
+	let a = C { w: 1, r: 0, };
+	let b = C { w: 3, r: 4, };
+    assert_eq!(C{w: 4, r: 4}, &a+&b);
+}
+#[test]
 fn add_assign() {
 	let mut a = C { w: 1, r: 0, };
 	let b = C { w: 3, r: 4, };
 	a += b;
+    assert_eq!(C{w: 4, r: 4}, a);
+}
+fn add_assign_ref() {
+	let mut a = C { w: 1, r: 0, };
+	let b = C { w: 3, r: 4, };
+	a += &b;
     assert_eq!(C{w: 4, r: 4}, a);
 }
 #[test]

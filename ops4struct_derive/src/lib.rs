@@ -12,17 +12,45 @@ use syn;
 pub fn add(input: TokenStream) -> TokenStream {
 	let (struct_name, fields) = prepare(input);
 
-	let add_ops = fields.iter().map(|field| {
+	let ops = fields.iter().map(|field| {
 		let ident = field.ident.as_ref().unwrap();
 		quote! { #ident: self.#ident + other.#ident }
 	});
 
+	let ops_ref_r = ops.clone();
+	let ops_ref_l = ops.clone();
+	let ops_ref_b = ops.clone();
 	let tokens = quote! {
 		impl Add for #struct_name {
-			type Output = Self;
-			fn add(self, other: Self) -> Self {
-				Self {
-					#( #add_ops, )*
+			type Output = #struct_name;
+			fn add(self, other: #struct_name) -> #struct_name {
+				#struct_name {
+					#( #ops, )*
+				}
+			}
+		}
+		impl Add<&#struct_name> for #struct_name {
+			type Output = <#struct_name as Add<#struct_name>>::Output;
+			fn add(self, other: &#struct_name) -> <#struct_name as Add<#struct_name>>::Output {
+				#struct_name {
+					#( #ops_ref_l, )*
+				}
+			}
+		}
+		impl<'a> Add<#struct_name> for &'a #struct_name {
+			type Output = <#struct_name as Add<#struct_name>>::Output;
+			fn add(self, other: #struct_name) -> <#struct_name as Add<#struct_name>>::Output {
+				#struct_name {
+					#( #ops_ref_r, )*
+				}
+			}
+		}
+
+		impl Add<&#struct_name> for &#struct_name {
+			type Output = <#struct_name as Add<#struct_name>>::Output;
+			fn add(self, other: &#struct_name) -> <#struct_name as Add<#struct_name>>::Output {
+				#struct_name {
+					#( #ops_ref_b, )*
 				}
 			}
 		}
@@ -39,11 +67,19 @@ pub fn add_assign(input: TokenStream) -> TokenStream {
 		quote! { #ident: self.#ident + other.#ident }
 	});
 
+	let ops2 = ops.clone();
 	let tokens = quote! {
 		impl AddAssign for #struct_name {
 			fn add_assign(&mut self, other: Self) {
 				*self = Self {
 					#( #ops, )*
+				}
+			}
+		}
+		impl AddAssign<&#struct_name> for #struct_name {
+			fn add_assign(&mut self, other: &Self) {
+				*self = Self {
+					#( #ops2, )*
 				}
 			}
 		}
