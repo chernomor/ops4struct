@@ -63,6 +63,24 @@ fn sub() {
     assert_eq!(C{w: 1, r: 1}, a-b);
 }
 #[test]
+fn sub_ref_r() {
+	let a = C { w: 4, r: 4, };
+	let b = C { w: 3, r: 3, };
+    assert_eq!(C{w: 1, r: 1}, a-&b);
+}
+#[test]
+fn sub_ref_l() {
+	let a = C { w: 4, r: 4, };
+	let b = C { w: 3, r: 3, };
+    assert_eq!(C{w: 1, r: 1}, &a-b);
+}
+#[test]
+fn sub_ref_b() {
+	let a = C { w: 4, r: 4, };
+	let b = C { w: 3, r: 3, };
+    assert_eq!(C{w: 1, r: 1}, &a-&b);
+}
+#[test]
 fn sub_assign() {
 	let mut a = C { w: 4, r: 4, };
 	let b = C { w: 3, r: 3, };

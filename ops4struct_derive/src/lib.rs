@@ -97,12 +97,40 @@ pub fn sub(input: TokenStream) -> TokenStream {
 		quote! { #ident: self.#ident - other.#ident }
 	});
 
+	let ops_ref_r = ops.clone();
+	let ops_ref_l = ops.clone();
+	let ops_ref_b = ops.clone();
 	let tokens = quote! {
 		impl Sub for #struct_name {
 			type Output = #struct_name;
 			fn sub(self, other: #struct_name) -> #struct_name {
 				#struct_name {
 					#( #ops, )*
+				}
+			}
+		}
+		impl Sub<&#struct_name> for #struct_name {
+			type Output = <#struct_name as Sub<#struct_name>>::Output;
+			fn sub(self, other: &#struct_name) -> <#struct_name as Sub<#struct_name>>::Output {
+				#struct_name {
+					#( #ops_ref_l, )*
+				}
+			}
+		}
+		impl<'a> Sub<#struct_name> for &'a #struct_name {
+			type Output = <#struct_name as Sub<#struct_name>>::Output;
+			fn sub(self, other: #struct_name) -> <#struct_name as Sub<#struct_name>>::Output {
+				#struct_name {
+					#( #ops_ref_r, )*
+				}
+			}
+		}
+
+		impl Sub<&#struct_name> for &#struct_name {
+			type Output = <#struct_name as Sub<#struct_name>>::Output;
+			fn sub(self, other: &#struct_name) -> <#struct_name as Sub<#struct_name>>::Output {
+				#struct_name {
+					#( #ops_ref_b, )*
 				}
 			}
 		}
