@@ -9,14 +9,14 @@ use ops4struct::Add;
 
 #[derive(Debug,PartialEq,Add,AddAssign,Sub,SubAssign)]
 struct C {
-	w: usize,
-	r: u8,
+    w: usize,
+    r: u8,
 }
 
 fn main() {
-	let a = C { w: 1, r: 0, };
-	let b = C { w: 3, r: 4, };
-	assert_eq!(C{w: 4, r: 4}, a+b);
+    let a = C { w: 1, r: 0, };
+    let b = C { w: 3, r: 4, };
+    assert_eq!(C{w: 4, r: 4}, a+b);
 }
 ```
 
