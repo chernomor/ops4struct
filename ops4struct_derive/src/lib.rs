@@ -7,14 +7,24 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
+use quote::quote_spanned;
 use syn;
+use syn::spanned::Spanned;
 
 #[proc_macro_derive(Add)]
 pub fn add(input: TokenStream) -> TokenStream {
-    let (struct_name, fields) = prepare(input);
+    let (struct_name, fields) = match prepare(input) {
+        Ok(r) => r,
+        Err(stream) => return stream,
+    };
 
     let ops = fields.iter().map(|field| {
-        let ident = field.ident.as_ref().unwrap();
+        let ident = match field.ident.as_ref(){
+            Some(i) => i,
+            None => return quote_spanned! {
+                field.ty.span()=>compile_error!("You can only derive this on structs with named fields!");
+            }.into(),
+        };
         quote! { #ident: self.#ident + other.#ident }
     });
 
@@ -61,10 +71,18 @@ pub fn add(input: TokenStream) -> TokenStream {
 }
 #[proc_macro_derive(AddAssign)]
 pub fn add_assign(input: TokenStream) -> TokenStream {
-    let (struct_name, fields) = prepare(input);
+    let (struct_name, fields) = match prepare(input) {
+        Ok(r) => r,
+        Err(stream) => return stream,
+    };
 
     let ops = fields.iter().map(|field| {
-        let ident = field.ident.as_ref().unwrap();
+        let ident = match field.ident.as_ref(){
+            Some(i) => i,
+            None => return quote_spanned! {
+                field.ty.span()=>compile_error!("You can only derive this on structs with named fields!");
+            }.into(),
+        };
         quote! { #ident: self.#ident + other.#ident }
     });
 
@@ -91,10 +109,18 @@ pub fn add_assign(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(Sub)]
 pub fn sub(input: TokenStream) -> TokenStream {
-    let (struct_name, fields) = prepare(input);
+    let (struct_name, fields) = match prepare(input) {
+        Ok(r) => r,
+        Err(stream) => return stream,
+    };
 
     let ops = fields.iter().map(|field| {
-        let ident = field.ident.as_ref().unwrap();
+        let ident = match field.ident.as_ref(){
+            Some(i) => i,
+            None => return quote_spanned! {
+                field.ty.span()=>compile_error!("You can only derive this on structs with named fields!");
+            }.into(),
+        };
         quote! { #ident: self.#ident - other.#ident }
     });
 
@@ -141,10 +167,18 @@ pub fn sub(input: TokenStream) -> TokenStream {
 }
 #[proc_macro_derive(SubAssign)]
 pub fn sub_assign(input: TokenStream) -> TokenStream {
-    let (struct_name, fields) = prepare(input);
+    let (struct_name, fields) = match prepare(input) {
+        Ok(r) => r,
+        Err(stream) => return stream,
+    };
 
     let ops = fields.iter().map(|field| {
-        let ident = field.ident.as_ref().unwrap();
+        let ident = match field.ident.as_ref(){
+            Some(i) => i,
+            None => return quote_spanned! {
+                field.ty.span()=>compile_error!("You can only derive this on structs with named fields!");
+            }.into(),
+        };
         quote! { #ident: self.#ident - other.#ident }
     });
 
@@ -163,20 +197,26 @@ pub fn sub_assign(input: TokenStream) -> TokenStream {
 
 
 fn prepare(input: TokenStream)
-    -> (proc_macro2::Ident, syn::punctuated::Punctuated<syn::Field, syn::token::Comma>)
+    -> Result<(proc_macro2::Ident, syn::punctuated::Punctuated<syn::Field, syn::token::Comma>), TokenStream>
 {
-    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    let ast: syn::DeriveInput = match syn::parse(input) {
+        Ok(a) => a,
+        Err(e) => return Err(e.to_compile_error().into()),
+    };
     let struct_name = ast.ident.clone();
 
-    let fields = match ast.data {
+    match ast.data {
         syn::Data::Struct(datastruct) => match datastruct.fields {
             syn::Fields::Named(fields) => {
-                fields.named.clone()
+                Ok((struct_name, fields.named.clone()))
             },
-            _ => panic!("You can only derive this on structs with named fields!"),
+            _ => Err(quote_spanned! {
+                datastruct.struct_token.span => compile_error!("You can only derive this on structs with named fields!");
+            }.into()),
         },
-        _ => panic!("You can only derive this on structs with named fields!"),
-    };
-    (struct_name, fields)
+        _ => Err(quote_spanned! {
+            ast.ident.span() => compile_error!("You can only derive this on structs with named fields!");
+        }.into()),
+    }
 }
 
